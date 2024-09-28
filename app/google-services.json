@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "887334271063",
+    "project_id": "conda-4a46b",
+    "storage_bucket": "conda-4a46b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887334271063:android:300be577f9cf273efecb12",
+        "android_client_info": {
+          "package_name": "com.udacity.project4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887334271063-kcukftutc8mc3qem839o39umamrm7d6v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnbvFBzDDpbv3_EJYSHfSVgBmrakGltEU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887334271063-kcukftutc8mc3qem839o39umamrm7d6v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
