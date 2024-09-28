@@ -1,9 +1,12 @@
 package com.udacity.project4.locationreminders
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
+import com.firebase.ui.auth.AuthUI
+import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.databinding.ActivityRemindersBinding
 
 /**
@@ -27,5 +30,10 @@ class RemindersActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+    fun navigateToAuthActivity() {
+        val intent = Intent(this, AuthenticationActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
