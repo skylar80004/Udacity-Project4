@@ -70,7 +70,7 @@ class ReminderListFragment : BaseFragment() {
         when (item.itemId) {
             R.id.logout -> {
                 _viewModel.logout()
-                
+
                 AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
                     (requireActivity() as? RemindersActivity)?.navigateToAuthActivity()
                 }

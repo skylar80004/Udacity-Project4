@@ -1,41 +1,49 @@
 {
   "project_info": {
-    "project_number": "887334271063",
-    "project_id": "conda-4a46b",
-    "storage_bucket": "conda-4a46b.appspot.com"
+    "project_number": "474008760506",
+    "project_id": "udacity-project4-f4d87",
+    "storage_bucket": "udacity-project4-f4d87.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:887334271063:android:300be577f9cf273efecb12",
+        "mobilesdk_app_id": "1:474008760506:android:c0b35a3199ce7e5f1c5283",
         "android_client_info": {
           "package_name": "com.udacity.project4"
         }
       },
       "oauth_client": [
         {
-          "client_id": "887334271063-1bp8dlfm50r7n9mfrnt76p7herfbmluj.apps.googleusercontent.com",
+          "client_id": "474008760506-5aqmbp1bvn0d4gkq7ka06o16n44uoua2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.udacity.project4",
-            "certificate_hash": "10153a19a49b913ba3774fcf304e59420075e398"
+            "certificate_hash": "2faf276e0d8c6cdd6b7947fc6e19a80625e51eae"
           }
         },
         {
-          "client_id": "887334271063-ujo71ais84943judhsathtarinj0h0km.apps.googleusercontent.com",
+          "client_id": "474008760506-5s1b46mf3jpufaj892tg3c7hgi2dk65l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udacity.project4",
+            "certificate_hash": "7bc2b30d6310781e4360cc40e42c5f463c10c05c"
+          }
+        },
+        {
+          "client_id": "474008760506-2gbk20g2jnah35tmkpjn31br6j088gj0.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBnbvFBzDDpbv3_EJYSHfSVgBmrakGltEU"
+          "current_key": "AIzaSyCBfBAnDV_lwpNmOKMI-dNez1CRl1PHjNk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "887334271063-kcukftutc8mc3qem839o39umamrm7d6v.apps.googleusercontent.com",
+              "client_id": "474008760506-2gbk20g2jnah35tmkpjn31br6j088gj0.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
