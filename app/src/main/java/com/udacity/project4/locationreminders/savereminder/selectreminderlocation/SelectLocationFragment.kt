@@ -3,6 +3,8 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 import android.Manifest
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -10,8 +12,10 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,6 +31,7 @@ import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
+import java.util.Locale
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
@@ -66,8 +71,23 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-    }
 
+        _viewModel.navigateBack.observe(viewLifecycleOwner) { event ->
+            if (event != null) {
+                _viewModel.clearNavigateBack()
+                findNavController().popBackStack()
+            }
+        }
+        _viewModel.showError.observe(viewLifecycleOwner) { showError ->
+            if (showError) {
+                _viewModel.clearError()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.err_select_location), Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
 
     private fun isLocationPermissionGranted(): Boolean {
         return ActivityCompat.checkSelfPermission(
@@ -156,15 +176,25 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 }
                 // Set a map click listener
                 map.setOnMapClickListener { latLng ->
-                    map.clear() // Clear any existing markers
+                    _viewModel.latitude.value = latLng.latitude
+                    _viewModel.longitude.value = latLng.longitude
+
+                    val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                    val addressList: List<Address>? = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                    val title = addressList?.firstOrNull()?.getAddressLine(0) ?: "Selected Location"
+                    _viewModel.reminderSelectedLocationStr.value = title
+
+                    map.clear()
                     map.addMarker(
                         MarkerOptions()
                             .position(latLng)
-                            .title("Selected Location")
+                            .title(title)
                     )?.showInfoWindow()
                 }
                 // Set a POI click listener
                 map.setOnPoiClickListener { poi ->
+                    _viewModel.selectedPOI.value = poi
+                    _viewModel.reminderSelectedLocationStr.value = poi.name
                     map.clear() // Clear any existing markers
                     map.addMarker(
                         MarkerOptions()
