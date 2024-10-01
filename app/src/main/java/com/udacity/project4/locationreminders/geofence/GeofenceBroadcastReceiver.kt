@@ -16,6 +16,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 import com.udacity.project4.R
+import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
@@ -88,10 +89,16 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun sendNotification(context: Context, reminderDTO: ReminderDTO) {
-        val intent = Intent(context, Activity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(REMINDER_ID, reminderDTO.id)
-        }
+        val reminderDataItem = ReminderDataItem(
+            title = reminderDTO.title,
+            description = reminderDTO.description,
+            location = reminderDTO.location,
+            latitude = reminderDTO.latitude,
+            longitude = reminderDTO.longitude,
+            id = reminderDTO.id
+        )
+
+        val intent = ReminderDescriptionActivity.newIntent(context, reminderDataItem)
 
         val pendingIntent: PendingIntent =
             PendingIntent.getActivity(
@@ -121,9 +128,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             NotificationManager::class.java
         ) as NotificationManager
 
-        println("prueba, sending notitication" )
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
+
 }
 
 
