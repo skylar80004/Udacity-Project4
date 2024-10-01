@@ -12,8 +12,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
@@ -47,7 +45,6 @@ class RemindersActivity : AppCompatActivity() {
         when (item.itemId) {
             android.R.id.home -> {
                 findNavController(binding.navHostFragment.id).popBackStack()
-                //(binding.navHostFragment as? NavHostFragment)?.navController?.popBackStack()
                 return true
             }
         }
@@ -67,7 +64,7 @@ class RemindersActivity : AppCompatActivity() {
     }
 
     @TargetApi(29)
-    private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
+    fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
         val foregroundLocationApproved = (
                 PackageManager.PERMISSION_GRANTED ==
                         ActivityCompat.checkSelfPermission(
@@ -86,12 +83,8 @@ class RemindersActivity : AppCompatActivity() {
         return foregroundLocationApproved && backgroundPermissionApproved
     }
 
-
-    val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 10
-    val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 12
-
     @TargetApi(29)
-    private fun requestForegroundAndBackgroundLocationPermissions() {
+    fun requestForegroundAndBackgroundLocationPermissions() {
         if (foregroundAndBackgroundLocationPermissionApproved())
             return
         var permissionsArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -110,9 +103,36 @@ class RemindersActivity : AppCompatActivity() {
         )
     }
 
-    val LOCATION_PERMISSION_INDEX = 0
-    val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
-    var permissionsReady = false
+    @TargetApi(29)
+    fun foregroundLocationPermissionApproved(): Boolean {
+        val foregroundLocationApproved = (
+                PackageManager.PERMISSION_GRANTED ==
+                        ActivityCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ))
+        return foregroundLocationApproved
+    }
+
+    @TargetApi(29)
+    fun requestForegroundLocationPermission() {
+        if (foregroundAndBackgroundLocationPermissionApproved())
+            return
+        var permissionsArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        val resultCode = when {
+            runningQOrLater -> {
+                permissionsArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
+            }
+
+            else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
+        }
+        ActivityCompat.requestPermissions(
+            this@RemindersActivity,
+            permissionsArray,
+            resultCode
+        )
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -139,8 +159,6 @@ class RemindersActivity : AppCompatActivity() {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     })
                 }.show()
-        } else {
-            permissionsReady = true
         }
     }
 
@@ -161,6 +179,14 @@ class RemindersActivity : AppCompatActivity() {
             } else {
                 requestForegroundAndBackgroundLocationPermissions()
             }
+
         }
+    }
+
+    private companion object {
+        const val LOCATION_PERMISSION_INDEX = 1
+        const val BACKGROUND_LOCATION_PERMISSION_INDEX = 2
+        const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 3
+        const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 4
     }
 }
