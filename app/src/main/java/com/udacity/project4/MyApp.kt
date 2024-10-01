@@ -1,6 +1,9 @@
 package com.udacity.project4
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
@@ -10,9 +13,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-//  AIzaSyDpYHlgzJCooFPacwsUWhqF9n0pdc6LaLE
 
-// AIzaSyB2XLq4CKh-ewaNVR5H0r8o6Wzc1px-KCU
 class MyApp : Application() {
 
 	override fun onCreate() {

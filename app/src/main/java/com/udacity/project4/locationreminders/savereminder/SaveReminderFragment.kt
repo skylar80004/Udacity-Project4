@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingRequest
@@ -13,6 +14,7 @@ import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSaveReminderBinding
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import com.udacity.project4.utils.GEOFENCE_RADIUS
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 
@@ -50,37 +52,46 @@ class SaveReminderFragment : BaseFragment() {
             val latitude = _viewModel.latitude.value
             val longitude = _viewModel.longitude.value
 
-            // TODO: use the user entered reminder details to:
-            //  1) add a geofencing request
-            //  2) save the reminder to the local db
-
             if (latitude != null && longitude != null) {
-                val geofence = Geofence.Builder()
-                    .setRequestId("GeofenceID")
-                    .setCircularRegion(latitude, longitude, 100f)
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .build()
-
-                val geofencingRequest: GeofencingRequest = GeofencingRequest.Builder()
-                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                    .addGeofence(geofence)
-                    .build()
-
-                (requireActivity() as? RemindersActivity)
-                    ?.addGeofenceRequest(geofencingRequest = geofencingRequest)
-
-                _viewModel.validateAndSaveReminder(reminderData = ReminderDataItem(
+                val reminderDataItem = ReminderDataItem(
                     title = title,
                     description = description,
                     location = location,
                     latitude = latitude,
                     longitude = longitude
-                ))
+                )
+                _viewModel.validateAndSaveReminder(reminderData = reminderDataItem)
+
+                addGeofence(
+                    latitude = latitude,
+                    longitude = longitude,
+                    id = reminderDataItem.id
+                )
             } else {
-                // TODO show message
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.select_location),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
+    }
+
+    private fun addGeofence(latitude: Double, longitude: Double, id: String) {
+        val geofence = Geofence.Builder()
+            .setRequestId(id)
+            .setCircularRegion(latitude, longitude, GEOFENCE_RADIUS)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+            .build()
+
+        val geofencingRequest: GeofencingRequest = GeofencingRequest.Builder()
+            .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            .addGeofence(geofence)
+            .build()
+
+        (requireActivity() as? RemindersActivity)
+            ?.addGeofenceRequest(geofencingRequest = geofencingRequest)
     }
 
     override fun onDestroy() {

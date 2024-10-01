@@ -3,6 +3,7 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 import android.Manifest
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
@@ -23,7 +24,9 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PointOfInterest
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
@@ -53,13 +56,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
-        // TODO: add the map setup implementation
-        // TODO: zoom to the user location after taking his permission
-        // TODO: add style to the map
-        // TODO: put a marker to location that the user selected
-
-        // TODO: call this function after the user confirms on the selected location
-        onLocationSelected()
         return binding.root
     }
 
@@ -102,39 +98,54 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    private fun onLocationSelected() {
-        // TODO: When the user confirms on the selected location,
-        //  send back the selected location details to the view model
-        //  and navigate back to the previous fragment to save the reminder and add the geofence
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.map_options, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        // TODO: Change the map type based on the user's selection.
-        R.id.normal_map -> {
-            true
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.normal_map -> {
+                // Set map type to Normal, using ?. for null safety
+                googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+                true
+            }
 
-        R.id.hybrid_map -> {
-            true
-        }
+            R.id.hybrid_map -> {
+                // Set map type to Hybrid
+                googleMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
+                true
+            }
 
-        R.id.satellite_map -> {
-            true
-        }
+            R.id.satellite_map -> {
+                // Set map type to Satellite
+                googleMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                true
+            }
 
-        R.id.terrain_map -> {
-            true
-        }
+            R.id.terrain_map -> {
+                // Set map type to Terrain
+                googleMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                true
+            }
 
-        else -> super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
+        }
     }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
+
+        try {
+            val success = googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style)
+            )
+            if (!success) {
+                Toast.makeText(requireContext(), "Error when parsing map style", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Resources.NotFoundException) {
+            Toast.makeText(requireContext(), "Map style not found", Toast.LENGTH_SHORT).show()
+        }
         enableLocationOnMap()
     }
 
@@ -191,20 +202,29 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                             .title(title)
                     )?.showInfoWindow()
                 }
-                // Set a POI click listener
                 map.setOnPoiClickListener { poi ->
-                    _viewModel.selectedPOI.value = poi
-                    _viewModel.reminderSelectedLocationStr.value = poi.name
-                    map.clear() // Clear any existing markers
-                    map.addMarker(
-                        MarkerOptions()
-                            .position(poi.latLng)
-                            .title(poi.name)
-                    )?.showInfoWindow()
+                    setPOI(map = map, poi = poi)
                 }
             }
         } else {
             (requireActivity() as? RemindersActivity)?.requestForegroundAndBackgroundLocationPermissions()
         }
+    }
+
+    private fun setPOI(map: GoogleMap, poi: PointOfInterest, ) {
+        _viewModel.selectedPOI.value = poi
+        _viewModel.reminderSelectedLocationStr.value = poi.name
+        _viewModel.latitude.value = poi.latLng.latitude
+        _viewModel.longitude.value = poi.latLng.longitude
+        setPointOfInterestInMap(map = map, poi = poi)
+    }
+
+    private fun setPointOfInterestInMap(map: GoogleMap, poi: PointOfInterest) {
+        map.clear() // Clear any existing markers
+        map.addMarker(
+            MarkerOptions()
+                .position(poi.latLng)
+                .title(poi.name)
+        )?.showInfoWindow()
     }
 }

@@ -1,6 +1,9 @@
 package com.udacity.project4.authentication
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityAuthenticationBinding // This is generated after enabling DataBinding
 import com.udacity.project4.locationreminders.RemindersActivity
+import com.udacity.project4.utils.GEOFENCE_CHANNEL_ID
 
 class AuthenticationActivity : AppCompatActivity() {
     companion object {
@@ -27,6 +31,7 @@ class AuthenticationActivity : AppCompatActivity() {
         binding.btnAuthLogin.setOnClickListener {
             launchSignInFlow()
         }
+        createChannel()
     }
 
     private fun launchSignInFlow() {
@@ -62,5 +67,25 @@ class AuthenticationActivity : AppCompatActivity() {
         val intent = Intent(this, RemindersActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun createChannel() {
+        val channelName = getString(R.string.channel_name)
+        val channelDescription = getString(R.string.notification_channel_description)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                GEOFENCE_CHANNEL_ID,
+                channelName,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationChannel.enableLights(true)
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = channelDescription
+
+            val notificationManager = getSystemService(
+                NotificationManager::class.java
+            )
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 }

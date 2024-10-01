@@ -21,6 +21,8 @@ import com.udacity.project4.R
 import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.databinding.ActivityRemindersBinding
 import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
+import com.udacity.project4.utils.ACTION_GEOFENCE_EVENT
+import com.udacity.project4.utils.GEOFENCE_PENDING_INTENT_REQUEST_CODE
 
 /**
  * The RemindersActivity that holds the reminders fragments
@@ -55,12 +57,6 @@ class RemindersActivity : AppCompatActivity() {
         val intent = Intent(this, AuthenticationActivity::class.java)
         startActivity(intent)
         finish()
-    }
-
-    private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-        intent.action = "ACTION_GEOFENCE_EVENT"
-        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     @TargetApi(29)
@@ -162,12 +158,25 @@ class RemindersActivity : AppCompatActivity() {
         }
     }
 
+
+    private val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        intent.action = ACTION_GEOFENCE_EVENT
+        PendingIntent.getBroadcast(
+            this,
+            GEOFENCE_PENDING_INTENT_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
     fun addGeofenceRequest(geofencingRequest: GeofencingRequest) {
         if (foregroundAndBackgroundLocationPermissionApproved()) {
+            println("prueba, adding geofence, checking permissions")
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
+                ) == PackageManager.PERMISSION_GRANTED
             ) {
                 geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)
                     .addOnSuccessListener {
@@ -177,9 +186,9 @@ class RemindersActivity : AppCompatActivity() {
                         println("prueba, on failed geofence")
                     }
             } else {
+                println("prueba, adding geofence, permissions not granted, requesting permissions")
                 requestForegroundAndBackgroundLocationPermissions()
             }
-
         }
     }
 
