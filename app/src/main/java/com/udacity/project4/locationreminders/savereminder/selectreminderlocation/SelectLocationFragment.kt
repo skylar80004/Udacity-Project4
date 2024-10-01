@@ -19,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
@@ -143,13 +144,33 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
 
         if (foregroundLocationApproved && backgroundPermissionApproved) {
-            // Enable location on the map
-            googleMap?.isMyLocationEnabled = true
-            // Get the last known location and move the camera to it
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    val currentLatLng = LatLng(location.latitude, location.longitude)
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+            googleMap?.let { map ->
+                // Enable location on the map
+                map.isMyLocationEnabled = true
+                // Get the last known location and move the camera to it
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        val currentLatLng = LatLng(location.latitude, location.longitude)
+                        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+                    }
+                }
+                // Set a map click listener
+                map.setOnMapClickListener { latLng ->
+                    map.clear() // Clear any existing markers
+                    map.addMarker(
+                        MarkerOptions()
+                            .position(latLng)
+                            .title("Selected Location")
+                    )?.showInfoWindow()
+                }
+                // Set a POI click listener
+                map.setOnPoiClickListener { poi ->
+                    map.clear() // Clear any existing markers
+                    map.addMarker(
+                        MarkerOptions()
+                            .position(poi.latLng)
+                            .title(poi.name)
+                    )?.showInfoWindow()
                 }
             }
         } else {
