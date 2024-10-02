@@ -40,7 +40,6 @@ class RemindersListViewModelTest {
         stopKoin()
     }
 
-
     @Test
     fun loadReminders_loading() = runTest {
         // Given a viewModel
@@ -88,7 +87,7 @@ class RemindersListViewModelTest {
     }
 
     @Test
-    fun loadReminders_nonEmptyList_showData() = runTest {
+    fun loadReminders_listWithValues_showData() = runTest {
         val title = "Title"
         val description = "Description"
         val location = "Location"
