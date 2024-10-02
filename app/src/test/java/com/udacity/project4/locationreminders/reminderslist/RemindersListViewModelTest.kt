@@ -56,7 +56,6 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_loading() = runTest {
         // Given a viewModel
-        // Pause the dispatcher to test the loading state
         mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         // When loadReminders is called
@@ -75,10 +74,9 @@ class RemindersListViewModelTest {
 
     @Test
     fun loadReminders_emptyList_showNoData() = runTest {
-        // Ensure the fake data source returns an empty list
+        // Given an empty list of reminders from data source
         fakeDataSource.deleteAllReminders()
 
-        // Given a viewModel
         val remindersListViewModel = RemindersListViewModel(
             app = ApplicationProvider.getApplicationContext(),
             dataSource = fakeDataSource
@@ -95,7 +93,6 @@ class RemindersListViewModelTest {
 
     @Test
     fun loadReminders_error_showSnackBar() = runTest {
-        // Ensure the fake data source returns an empty list
         val title = "Title"
         val description = "Description"
         val location = "Location"
@@ -108,18 +105,18 @@ class RemindersListViewModelTest {
         fakeDataSource.setReturnError(true)
         fakeDataSource.saveReminder(reminder)
 
-        // Given a viewModel
+        // Given a data source that returns an error
         val remindersListViewModel = RemindersListViewModel(
             app = ApplicationProvider.getApplicationContext(),
             dataSource = fakeDataSource
         )
 
-        // When loadReminders is called and an empty list is returned by data source
+        // When loadReminders is called
         mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         remindersListViewModel.loadReminders()
         mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        // Then show no data indicator
+        // Then show no data indicator is shown and snack bar error is shown with the exception message
         assertThat(remindersListViewModel.showNoData.getOrAwaitValue(), `is`(true))
         assertThat(remindersListViewModel.showSnackBar.getOrAwaitValue(), `is`("Test exception"))
     }
@@ -137,13 +134,12 @@ class RemindersListViewModelTest {
         fakeDataSource.deleteAllReminders()
         fakeDataSource.saveReminder(reminder)
 
-        // Given a viewmodel
         val remindersListViewModel = RemindersListViewModel(
             app = ApplicationProvider.getApplicationContext(),
             dataSource = fakeDataSource
         )
 
-        // When loadReminders is called and dataSource returns list a value
+        // Given a data source 
         mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         remindersListViewModel.loadReminders()
         mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
