@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.getOrAwaitValue
+import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -33,7 +34,19 @@ class RemindersListViewModelTest {
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
-    private val fakeDataSource = FakeDataSource()
+
+    private lateinit var remindersListViewModel: RemindersListViewModel
+    private lateinit var fakeDataSource: FakeDataSource
+
+
+    @Before
+    fun setup() {
+        fakeDataSource = FakeDataSource()
+        remindersListViewModel = RemindersListViewModel(
+            app = ApplicationProvider.getApplicationContext(),
+            dataSource = fakeDataSource
+        )
+    }
 
     @After
     fun tearDown() {
@@ -43,12 +56,6 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_loading() = runTest {
         // Given a viewModel
-
-        val remindersListViewModel = RemindersListViewModel(
-            app = ApplicationProvider.getApplicationContext(),
-            dataSource = fakeDataSource
-        )
-
         // Pause the dispatcher to test the loading state
         mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
@@ -84,6 +91,37 @@ class RemindersListViewModelTest {
 
         // Then show no data indicator
         assertThat(remindersListViewModel.showNoData.getOrAwaitValue(), `is`(true))
+    }
+
+    @Test
+    fun loadReminders_error_showSnackBar() = runTest {
+        // Ensure the fake data source returns an empty list
+        val title = "Title"
+        val description = "Description"
+        val location = "Location"
+        val latitude = 1.0
+        val longitude = 2.0
+        val id = "id1"
+
+        val reminder = ReminderDTO(title, description, location, latitude, longitude, id)
+        fakeDataSource.deleteAllReminders()
+        fakeDataSource.setReturnError(true)
+        fakeDataSource.saveReminder(reminder)
+
+        // Given a viewModel
+        val remindersListViewModel = RemindersListViewModel(
+            app = ApplicationProvider.getApplicationContext(),
+            dataSource = fakeDataSource
+        )
+
+        // When loadReminders is called and an empty list is returned by data source
+        mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        remindersListViewModel.loadReminders()
+        mainCoroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then show no data indicator
+        assertThat(remindersListViewModel.showNoData.getOrAwaitValue(), `is`(true))
+        assertThat(remindersListViewModel.showSnackBar.getOrAwaitValue(), `is`("Test exception"))
     }
 
     @Test
