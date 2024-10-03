@@ -2,12 +2,10 @@ package com.udacity.project4
 
 import android.app.Activity
 import android.app.Application
-import android.view.View
-import android.view.Window
-import android.widget.TextView
+import android.os.IBinder
+import android.view.WindowManager
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.Root
@@ -28,15 +26,14 @@ import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
-import com.udacity.project4.locationreminders.savereminder.selectreminderlocation.SelectLocationFragment
 import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
+import com.udacity.project4.utils.EspressoUtil
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Description
-import org.hamcrest.Matcher
-import org.hamcrest.Matchers.instanceOf
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.TypeSafeMatcher
+import org.hamcrest.core.IsNot
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -47,20 +44,12 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.Test
-import android.os.IBinder
-
-import android.view.WindowManager
-import androidx.test.filters.SdkSuppress
-import com.udacity.project4.utils.EspressoUtil
-import org.hamcrest.Matchers
-import org.hamcrest.core.IsNot
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 //END TO END test to black box test the app
 class RemindersActivityTest :
     KoinTest {// Extended Koin Test - embed autoclose @after method to close Koin after every test
-
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
 
@@ -117,8 +106,7 @@ class RemindersActivityTest :
     }
 
     @Test
-    //@SdkSuppress(minSdkVersion = 28, maxSdkVersion = 28)
-    fun addReminder_displayInList() = runBlocking {
+    fun saveReminderButton_clickedWithNoLocation_errorToastMessageIsShown() = runBlocking {
         // Start RemindersActivity
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -132,7 +120,7 @@ class RemindersActivityTest :
         // 3. Enter reminder details
         onView(withId(R.id.reminderTitle)).perform(typeText("Test Reminder Title"))
         onView(withId(R.id.reminderDescription)).perform(typeText("Test Reminder Description"))
-        onView(isRoot()).perform(closeSoftKeyboard()) // Close the soft keyboard
+        onView(isRoot()).perform(closeSoftKeyboard())
 
         // 4. Select a location (mock the location selection)
         onView(withId(R.id.saveReminder)).perform(click())
@@ -149,10 +137,27 @@ class RemindersActivityTest :
 //            .check(matches(isDisplayed()))
 
         activityScenario.close()
-
     }
 
-    private fun getActivityFromScenario(activityScenario: ActivityScenario<RemindersActivity>): Activity? {
+    @Test
+    fun floatingActionButton_clicked_saveReminderViewIsShown() = runBlocking {
+        //Given the RemindersActivity is shown
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        //When the add reminder floating action button is clicked
+        onView(withId(R.id.addReminderFAB)).perform(click())
+
+        //Then the UI elements from SaveReminderFragment are shown
+        onView(withId(R.id.selectLocation)).check(matches(isDisplayed()))
+        onView(withId(R.id.reminderTitle)).check(matches(isDisplayed()))
+        onView(withId(R.id.reminderDescription)).check(matches(isDisplayed()))
+        activityScenario.close()
+    }
+
+    private fun getActivityFromScenario(
+        activityScenario: ActivityScenario<RemindersActivity>
+    ): Activity? {
         var activity: Activity? = null
         activityScenario.onActivity {
             activity = it
@@ -162,7 +167,6 @@ class RemindersActivityTest :
 }
 
 class ToastMatcher : TypeSafeMatcher<Root?>() {
-
     override fun describeTo(description: Description?) {
         description?.appendText("is toast")
     }
