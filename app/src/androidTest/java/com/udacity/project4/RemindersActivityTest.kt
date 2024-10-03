@@ -1,12 +1,16 @@
 package com.udacity.project4
 
+import android.app.Activity
 import android.app.Application
 import android.view.View
+import android.view.Window
 import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.Root
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.typeText
@@ -30,6 +34,8 @@ import com.udacity.project4.util.monitorActivity
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.`is`
 import org.hamcrest.TypeSafeMatcher
 import org.junit.After
 import org.junit.Before
@@ -41,6 +47,13 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.Test
+import android.os.IBinder
+
+import android.view.WindowManager
+import androidx.test.filters.SdkSuppress
+import com.udacity.project4.utils.EspressoUtil
+import org.hamcrest.Matchers
+import org.hamcrest.core.IsNot
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -93,20 +106,18 @@ class RemindersActivityTest :
 
     @Before
     fun registerIdlingResource() {
+        IdlingRegistry.getInstance().register(EspressoUtil.counting_id_resource)
         IdlingRegistry.getInstance().register(dataBindingIdlingResource)
     }
 
     @After
     fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
+        IdlingRegistry.getInstance().unregister(EspressoUtil.counting_id_resource)
     }
 
     @Test
-    fun test() {
-
-    }
-
-    @Test
+    //@SdkSuppress(minSdkVersion = 28, maxSdkVersion = 28)
     fun addReminder_displayInList() = runBlocking {
         // Start RemindersActivity
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
@@ -124,30 +135,48 @@ class RemindersActivityTest :
         onView(isRoot()).perform(closeSoftKeyboard()) // Close the soft keyboard
 
         // 4. Select a location (mock the location selection)
-        onView(withId(R.id.selectLocation)).perform(click())
+        onView(withId(R.id.saveReminder)).perform(click())
 
-        Thread.sleep(5000)
+        onView(withText("Please select location")).inRoot(
+            withDecorView(
+                IsNot.not(`is`(getActivityFromScenario(activityScenario)?.window?.decorView))
+            )
+        ).check(matches(isDisplayed()))
+
+//        // works only on api w8
+//        onView(withText("Please select location"))
+//            .inRoot(ToastMatcher())
+//            .check(matches(isDisplayed()))
+
         activityScenario.close()
 
     }
+
+    private fun getActivityFromScenario(activityScenario: ActivityScenario<RemindersActivity>): Activity? {
+        var activity: Activity? = null
+        activityScenario.onActivity {
+            activity = it
+        }
+        return activity
+    }
 }
 
-class ToastMatcher(private val expectedText: String) : TypeSafeMatcher<View>() {
+class ToastMatcher : TypeSafeMatcher<Root?>() {
 
     override fun describeTo(description: Description?) {
-        description?.appendText("with text: $expectedText")
+        description?.appendText("is toast")
     }
 
-    override fun matchesSafely(item: View): Boolean {
-        if (item is TextView) {
-            return item.text.toString() == expectedText
+    override fun matchesSafely(item: Root?): Boolean {
+        val type: Int? = item?.windowLayoutParams?.get()?.type
+        if (type == WindowManager.LayoutParams.TYPE_TOAST) {
+            val windowToken: IBinder = item.decorView.windowToken
+            val appToken: IBinder = item.decorView.getApplicationWindowToken()
+            if (windowToken === appToken) { // means this window isn't contained by any other windows.
+                return true
+            }
         }
         return false
     }
 
-    companion object {
-        fun withText(expectedText: String): Matcher<View> {
-            return ToastMatcher(expectedText)
-        }
-    }
 }
