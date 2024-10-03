@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityAuthenticationBinding // This is generated after enabling DataBinding
 import com.udacity.project4.locationreminders.RemindersActivity
@@ -32,6 +33,13 @@ class AuthenticationActivity : AppCompatActivity() {
             launchSignInFlow()
         }
         createChannel()
+
+        val auth = FirebaseAuth.getInstance()
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            navigateToRemindersActivity()
+        }
     }
 
     private fun launchSignInFlow() {

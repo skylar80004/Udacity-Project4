@@ -112,17 +112,10 @@ class RemindersActivity : AppCompatActivity() {
 
     @TargetApi(29)
     fun requestForegroundLocationPermission() {
-        if (foregroundAndBackgroundLocationPermissionApproved())
+        if (foregroundLocationPermissionApproved())
             return
-        var permissionsArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        val resultCode = when {
-            runningQOrLater -> {
-                permissionsArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
-            }
-
-            else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
-        }
+        val permissionsArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        val resultCode = REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
         ActivityCompat.requestPermissions(
             this@RemindersActivity,
             permissionsArray,
@@ -138,10 +131,14 @@ class RemindersActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (
             grantResults.isEmpty() ||
-            grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
-            (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE &&
-                    grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
-                    PackageManager.PERMISSION_DENIED)
+
+            (requestCode == REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE && grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED)
+            || (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE && grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED)
+            
+//            grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
+//            (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE &&
+//                    grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
+//                    PackageManager.PERMISSION_DENIED)
         ) {
             Snackbar.make(
                 binding.root,
@@ -193,8 +190,8 @@ class RemindersActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val LOCATION_PERMISSION_INDEX = 1
-        const val BACKGROUND_LOCATION_PERMISSION_INDEX = 2
+        const val LOCATION_PERMISSION_INDEX = 0
+        const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
         const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 3
         const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 4
     }

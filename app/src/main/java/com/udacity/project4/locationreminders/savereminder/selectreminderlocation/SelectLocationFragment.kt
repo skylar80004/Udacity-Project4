@@ -164,17 +164,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                             Manifest.permission.ACCESS_FINE_LOCATION
                         )
                 )
-
-        val backgroundPermissionApproved = if (runningQOrLater) {
-            PackageManager.PERMISSION_GRANTED ==
-                    ActivityCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                    )
-        } else {
-            true
-        }
-
-        if (foregroundLocationApproved && backgroundPermissionApproved) {
+        if (foregroundLocationApproved) {
             googleMap?.let { map ->
                 // Enable location on the map
                 map.isMyLocationEnabled = true
@@ -212,7 +202,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 }
             }
         } else {
-            (requireActivity() as? RemindersActivity)?.requestForegroundAndBackgroundLocationPermissions()
+            (requireActivity() as? RemindersActivity)?.requestForegroundLocationPermission()
         }
     }
 
