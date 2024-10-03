@@ -29,9 +29,10 @@ import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoUtil
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Description
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers
 import org.hamcrest.TypeSafeMatcher
 import org.hamcrest.core.IsNot
 import org.junit.After
@@ -125,18 +126,22 @@ class RemindersActivityTest :
         // 4. Select a location (mock the location selection)
         onView(withId(R.id.saveReminder)).perform(click())
 
-        onView(withText("Please select location")).inRoot(
-            withDecorView(
-                IsNot.not(`is`(getActivityFromScenario(activityScenario)?.window?.decorView))
-            )
-        ).check(matches(isDisplayed()))
-
-//        // works only on api w8
-//        onView(withText("Please select location"))
-//            .inRoot(ToastMatcher())
-//            .check(matches(isDisplayed()))
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+            .check(matches(withText(R.string.err_select_location)))
 
         activityScenario.close()
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun showReminderToast() = runBlocking{
+        val remindersActivityActivityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(remindersActivityActivityScenario)
+        onView(withId(R.id.addReminderFAB)).perform(click())
+        onView(withId(R.id.saveReminder)).perform(click())
+        onView(withText("Please enter title")).inRoot(withDecorView(
+            IsNot.not(Matchers.`is`(getActivityFromScenario(remindersActivityActivityScenario)?.window?.decorView)))).check(matches(isDisplayed()))
+        remindersActivityActivityScenario.close()
     }
 
     @Test

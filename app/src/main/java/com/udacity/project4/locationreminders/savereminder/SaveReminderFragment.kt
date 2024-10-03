@@ -52,27 +52,22 @@ class SaveReminderFragment : BaseFragment() {
             val latitude = _viewModel.latitude.value
             val longitude = _viewModel.longitude.value
 
-            if (latitude != null && longitude != null) {
-                val reminderDataItem = ReminderDataItem(
-                    title = title,
-                    description = description,
-                    location = location,
-                    latitude = latitude,
-                    longitude = longitude
-                )
-                _viewModel.validateAndSaveReminder(reminderData = reminderDataItem)
+            val reminderDataItem = ReminderDataItem(
+                title = title,
+                description = description,
+                location = location,
+                latitude = latitude,
+                longitude = longitude
+            )
 
-                addGeofence(
-                    latitude = latitude,
-                    longitude = longitude,
-                    id = reminderDataItem.id
-                )
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.select_location),
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (_viewModel.validateAndSaveReminder(reminderData = reminderDataItem)) {
+                if (latitude != null && longitude != null) {
+                    addGeofence(
+                        latitude = latitude,
+                        longitude = longitude,
+                        id = reminderDataItem.id
+                    )
+                }
             }
         }
     }
