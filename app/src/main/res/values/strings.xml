@@ -52,4 +52,5 @@
     <string name="label_location">Location:</string>
     <string name="label_latitude">Latitude:</string>
     <string name="label_longitude">Longitude:</string>
+    <string name="geofence_created">Geofence created</string>
 </resources>

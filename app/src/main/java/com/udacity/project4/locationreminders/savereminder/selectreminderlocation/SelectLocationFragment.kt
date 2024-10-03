@@ -4,8 +4,6 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.location.Address
-import android.location.Geocoder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -34,7 +32,6 @@ import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
-import java.util.Locale
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
@@ -141,7 +138,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style)
             )
             if (!success) {
-                Toast.makeText(requireContext(), "Error when parsing map style", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error when parsing map style", Toast.LENGTH_SHORT)
+                    .show()
             }
         } catch (e: Resources.NotFoundException) {
             Toast.makeText(requireContext(), "Map style not found", Toast.LENGTH_SHORT).show()
@@ -206,7 +204,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setPOI(map: GoogleMap, poi: PointOfInterest, ) {
+    private fun setPOI(map: GoogleMap, poi: PointOfInterest) {
         _viewModel.selectedPOI.value = poi
         _viewModel.reminderSelectedLocationStr.value = poi.name
         _viewModel.latitude.value = poi.latLng.latitude
