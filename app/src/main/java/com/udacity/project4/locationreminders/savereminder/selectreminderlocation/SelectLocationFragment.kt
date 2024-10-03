@@ -190,9 +190,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     _viewModel.latitude.value = latLng.latitude
                     _viewModel.longitude.value = latLng.longitude
 
-                    val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                    val addressList: List<Address>? = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                    val title = addressList?.firstOrNull()?.getAddressLine(0) ?: "Selected Location"
+                    var title = "Selected location"
+//                    try {
+//                        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+//                        val addressList: List<Address>? = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+//                        title = addressList?.firstOrNull()?.getAddressLine(0) ?: "Selected Location"
+//                    } catch (e: Exception) {
+//
+//                    }
                     _viewModel.reminderSelectedLocationStr.value = title
 
                     map.clear()
