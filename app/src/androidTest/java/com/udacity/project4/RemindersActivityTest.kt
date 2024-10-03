@@ -13,7 +13,6 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -29,12 +28,9 @@ import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoUtil
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Description
-import org.hamcrest.Matchers
 import org.hamcrest.TypeSafeMatcher
-import org.hamcrest.core.IsNot
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -132,16 +128,29 @@ class RemindersActivityTest :
         activityScenario.close()
     }
 
-    @ExperimentalCoroutinesApi
     @Test
-    fun showReminderToast() = runBlocking{
-        val remindersActivityActivityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(remindersActivityActivityScenario)
+    fun saveReminderButton_clickedWithNoTitle_errorToastMessageIsShown() = runBlocking {
+        // Start RemindersActivity
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        // 1. Check if the RemindersActivity is displayed
+        onView(withId(R.id.activity_reminders_cl)).check(matches(isDisplayed()))
+
+        // 2. Navigate to the "Save Reminder" screen
         onView(withId(R.id.addReminderFAB)).perform(click())
+
+        // 3. Enter reminder details
+        onView(withId(R.id.reminderDescription)).perform(typeText("Test Reminder Description"))
+        onView(isRoot()).perform(closeSoftKeyboard())
+
+        // 4. Select a location (mock the location selection)
         onView(withId(R.id.saveReminder)).perform(click())
-        onView(withText("Please enter title")).inRoot(withDecorView(
-            IsNot.not(Matchers.`is`(getActivityFromScenario(remindersActivityActivityScenario)?.window?.decorView)))).check(matches(isDisplayed()))
-        remindersActivityActivityScenario.close()
+
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+            .check(matches(withText(R.string.err_enter_title)))
+
+        activityScenario.close()
     }
 
     @Test
