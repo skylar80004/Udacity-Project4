@@ -149,8 +149,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private var googleMap: GoogleMap? = null
 
-    private val runningQOrLater = android.os.Build.VERSION.SDK_INT >=
-            android.os.Build.VERSION_CODES.Q
 
     @TargetApi(29)
     fun enableLocationOnMap() {

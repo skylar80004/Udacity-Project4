@@ -14,6 +14,7 @@ import androidx.navigation.findNavController
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.R
 import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.databinding.ActivityRemindersBinding
@@ -72,8 +73,8 @@ class RemindersActivity : AppCompatActivity() {
         )
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    private fun showSnackBar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 
     fun addGeofence(geofencingRequest: GeofencingRequest, geofencePendingIntent: PendingIntent) {
@@ -87,11 +88,11 @@ class RemindersActivity : AppCompatActivity() {
 
         geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
             addOnSuccessListener {
-                showToast(getString(R.string.geofence_created))
+                showSnackBar(getString(R.string.geofence_created))
             }
             addOnFailureListener {
                 if (it.message != null) {
-                    showToast(getString(R.string.geofences_not_added) + " ${it.message}")
+                    showSnackBar(getString(R.string.geofences_not_added) + " ${it.message}")
                 }
             }
         }
