@@ -53,7 +53,6 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             // Get the geofence transition type.
             val geofenceTransition = geofencingEvent?.geofenceTransition
 
-
             println("prueba, geofence transition $geofenceTransition")
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 println("prueba, geo fence transition enter")
@@ -62,10 +61,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
                 geofencingEvent.triggeringGeofences?.forEach { geofence ->
                     val id = geofence.requestId
-
                     println("prueba, geofence request id: $id")
-
-
 
                     CoroutineScope(Dispatchers.IO).launch {
                         val result: com.udacity.project4.locationreminders.data.dto.Result<ReminderDTO> =
@@ -109,7 +105,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             .setContentText(
                 context.getString(
                     R.string.notification_message,
-                    reminderDTO.description
+                    reminderDTO.title
                 )
             )
             .setPriority(NotificationCompat.PRIORITY_HIGH)

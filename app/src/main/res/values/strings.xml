@@ -37,6 +37,7 @@
 
     <string name="notification_title">You reached your location</string>
     <string name="notification_message">Reminder: %1$s</string>
+    <string name="notification_permission_declined_message">Notification permission is required to show Location Reminders</string>
 
     <!-- Error strings -->
     <string name="geofence_unknown_error">Unknown error: the Geofence service is not available now.</string>

@@ -1,7 +1,7 @@
 package com.udacity.project4.utils
 
 const val ACTION_GEOFENCE_EVENT = "ACTION_GEOFENCE_EVENT"
-const val GEOFENCE_RADIUS = 10F
+const val GEOFENCE_RADIUS = 20F
 const val GEOFENCE_CHANNEL_ID = "GEOFENCE_CHANNEL_ID"
 
 
