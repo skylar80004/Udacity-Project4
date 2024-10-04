@@ -1,15 +1,11 @@
 package com.udacity.project4.locationreminders.geofence
 
-import android.app.Activity
-import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings.Global.getString
 import android.util.Log
-import android.util.Printer
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.Geofence
@@ -23,7 +19,6 @@ import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.ACTION_GEOFENCE_EVENT
 import com.udacity.project4.utils.GEOFENCE_CHANNEL_ID
 import com.udacity.project4.utils.NOTIFICATION_ID
-import com.udacity.project4.utils.REMINDER_ID
 import com.udacity.project4.utils.REMINDER_NOTIFICATION_PENDING_INTENT_REQUEST_CODE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

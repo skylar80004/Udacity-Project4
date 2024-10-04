@@ -159,28 +159,27 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private var googleMap: GoogleMap? = null
 
-
     private fun initMap() {
         googleMap?.let { map ->
             // Enable location on the map
             if (ActivityCompat.checkSelfPermission(
                     requireContext(),
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                     requireContext(),
                     Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
+                ) == PackageManager.PERMISSION_GRANTED
             ) {
-                return
-            }
-            map.isMyLocationEnabled = true
-            // Get the last known location and move the camera to it
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    val currentLatLng = LatLng(location.latitude, location.longitude)
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+                map.isMyLocationEnabled = true
+                // Get the last known location and move the camera to it
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        val currentLatLng = LatLng(location.latitude, location.longitude)
+                        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+                    }
                 }
             }
+
             // Set a map click listener
             map.setOnMapClickListener { latLng ->
                 _viewModel.latitude.value = latLng.latitude
