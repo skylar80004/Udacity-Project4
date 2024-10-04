@@ -3,10 +3,13 @@ package com.udacity.project4.utils
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.view.View
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.base.BaseRecyclerViewAdapter
 
 /**
@@ -58,4 +61,8 @@ fun View.fadeOut() {
             this@fadeOut.visibility = View.GONE
         }
     })
+}
+
+fun Fragment.showToast(@StringRes resId: Int) {
+    Toast.makeText(requireContext(), resId, Toast.LENGTH_SHORT).show()
 }
