@@ -63,12 +63,11 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             val fineLocationGranted = isGranted
 
             if (fineLocationGranted) {
-                println("prueba, permission granted")
-                initMap()
             } else {
-                println("prueba, permission not granted")
                 showToast(R.string.location_required_error)
             }
+
+            initMap()
         }
 
         return binding.root
